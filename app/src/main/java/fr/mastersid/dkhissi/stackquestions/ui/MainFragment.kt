@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import fr.mastersid.dkhissi.stackquestions.R
 import fr.mastersid.dkhissi.stackquestions.adapters.QuestionsAdapter
 import fr.mastersid.dkhissi.stackquestions.objects.Question
+import fr.mastersid.dkhissi.stackquestions.repositories.StackRepository
 import fr.mastersid.dkhissi.stackquestions.viewmodels.StackViewModel
 import kotlinx.android.synthetic.main.fragment_main.*
 
@@ -46,13 +48,32 @@ class MainFragment : Fragment() {
 
         myRefresh.setOnRefreshListener {
             stackViewModel.updateQuestionsList()
-            myRefresh.isRefreshing=false
+
         }
 
+        stackViewModel.requestState.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                StackRepository.RequestState.NONE_OR_DONE -> myRefresh.isRefreshing=false
+                StackRepository.RequestState.PENDING -> myRefresh.isRefreshing=true
+                StackRepository.RequestState.ERROR_NETWORK -> errorNetwork()
+                StackRepository.RequestState.ERROR_REQUETE -> errorRequest()
+            }
+        })
 
 
 
 
+
+    }
+
+    private fun errorNetwork() {
+        Toast.makeText(activity,"Network Error",Toast.LENGTH_SHORT).show()
+        myRefresh.isRefreshing=false
+    }
+
+    private fun errorRequest() {
+        Toast.makeText(activity,"Request Error",Toast.LENGTH_SHORT).show()
+        myRefresh.isRefreshing=false
     }
 
     override fun onCreateView(

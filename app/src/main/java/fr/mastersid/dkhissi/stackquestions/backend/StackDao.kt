@@ -9,6 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import fr.mastersid.dkhissi.stackquestions.objects.Question
+import java.util.concurrent.Flow
 import javax.inject.Singleton
 
 
@@ -19,7 +20,7 @@ interface StackDao {
     suspend fun insertAll ( list : List < Question >)
 
     @Query(" SELECT * FROM question_table ")
-    fun getQuestionsList () : LiveData<List<Question>>
+    fun getQuestionsList () : kotlinx.coroutines.flow.Flow<List<Question>>
 }
 
 
